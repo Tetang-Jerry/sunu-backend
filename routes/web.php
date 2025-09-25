@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CoachesController;
 use App\Http\Controllers\SessionsController;
+use App\Http\Controllers\NotificationsController;
 use App\Models\User;
 use App\Models\Coach;
 use App\Models\TrainingSession;
@@ -81,4 +82,9 @@ Route::middleware('auth.session')->group(function () {
         Route::get('/{coach}', [CoachesController::class, 'show'])->name('show');
         Route::delete('/{coach}', [CoachesController::class, 'destroy'])->name('destroy');
     });
+
+    // Notifications
+    Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationsController::class, 'markAllRead'])->name('notifications.readAll');
+    Route::post('/notifications/{notification}/read', [NotificationsController::class, 'markRead'])->name('notifications.read');
 });
