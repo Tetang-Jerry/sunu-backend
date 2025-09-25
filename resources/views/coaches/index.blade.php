@@ -36,7 +36,18 @@
           <tr class="hover:bg-gray-50">
             <td class="px-4 py-2 text-sm text-gray-900">{{ optional($coach->user)->first_name }} {{ optional($coach->user)->last_name }}</td>
             <td class="px-4 py-2 text-sm text-gray-700">{{ $coach->specialty }}</td>
-            <td class="px-4 py-2 text-sm text-gray-700">{{ $coach->availability }}</td>
+            <td class="px-4 py-2 text-sm text-gray-700">
+              @php($av = $coach->availability_json ?? [])
+              @if(is_array($av) && count($av))
+                @php($days = collect($av)->pluck('date')->unique()->sort()->values())
+                <span class="px-2 py-1 text-xs rounded-full bg-emerald-50 text-emerald-700">{{ $days->count() }} jour(s)</span>
+                @if($days->count())
+                  <span class="ml-2 text-xs text-gray-500">dès {{ \Carbon\Carbon::parse($days->first())->format('d/m') }}</span>
+                @endif
+              @else
+                —
+              @endif
+            </td>
             <td class="px-4 py-2 text-sm text-gray-700">{{ \Illuminate\Support\Str::limit($coach->bio, 80) }}</td>
             <td class="px-4 py-2 text-sm text-right">
               <div class="flex items-center justify-end gap-3">
