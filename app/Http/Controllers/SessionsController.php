@@ -6,6 +6,7 @@ use App\Models\Member;
 use App\Models\TrainingSession;
 use App\Models\Coach;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -71,6 +72,29 @@ class SessionsController extends Controller
             'status'      => $data['status'],
             'location'    => $data['location'] ?? null,
         ]);
+
+        // Send in-app notifications to coach (user) and admins
+        try {
+            $coachUserId = optional(Coach::with('user')->find($session->coach_id))->user->id ?? null;
+            $adminIds = User::where('role','admin')->pluck('id')->all();
+            $recipientIds = collect([$coachUserId])->filter()->merge($adminIds)->unique()->values();
+            if ($recipientIds->count()) {
+                $title = 'Nouvelle séance planifiée';
+                $member = optional(User::find($session->user_id));
+                $body = 'Séance le '. $session->date_time->format('d/m/Y H:i') . ' avec ' . trim(($member->first_name ?? '').' '.($member->last_name ?? ''));
+                $url = route('sessions.show', $session);
+                foreach ($recipientIds as $uid) {
+                    Notification::create([
+                        'user_id' => $uid,
+                        'title'   => $title,
+                        'body'    => $body,
+                        'url'     => $url,
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // swallow notification errors so session creation still succeeds
+        }
         return redirect()->route('sessions.show', $session)->with('success', 'Séance créée avec succès');
     }
 
