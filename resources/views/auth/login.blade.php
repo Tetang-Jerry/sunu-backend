@@ -6,8 +6,8 @@
   <div class="hidden md:flex flex-col justify-center bg-gradient-to-br from-[rgba(33,173,40,1)] to-[rgba(93,206,99,1)] p-10 text-white">
     <div class="max-w-md">
       <div class="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-xl mb-6">F</div>
-      <h1 class="text-3xl font-heading text-white mb-3">Fitness Backoffice</h1>
-      <p class="text-white/90">Gérez utilisateurs, séances, abonnements et paiements dans un espace propre et moderne, aligné avec votre front React.</p>
+      <h1 class="text-3xl font-heading text-white mb-3">SUNU FITNESS</h1>
+      <p class="text-white/90">Gérez utilisateurs, séances, abonnements et paiements dans un espace propre et moderne.</p>
       <div class="mt-8 grid grid-cols-2 gap-4 text-sm">
         <div class="bg-white/20 rounded-xl p-4">
           <div class="text-white/80">Séances</div>

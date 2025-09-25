@@ -24,19 +24,17 @@
     <!-- Sidebar -->
     <aside class="hidden md:flex md:flex-col w-64 bg-white border-r border-gray-200">
       <div class="h-16 flex items-center px-4 border-b">
-        <div class="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold">F</div>
-        <div class="ml-2">
-          <div class="font-heading font-semibold">Fitness Admin</div>
-          <div class="text-xs text-gray-500">Backoffice</div>
-        </div>
+       
+          <img src="{{ asset('img/sunu.png') }}" alt="Logo" class="h-full w-full">
+       
+       
       </div>
       <nav class="flex-1 p-3 space-y-1">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 {{ request()->routeIs('dashboard') ? 'bg-gray-100 font-medium' : '' }}">
           <span>Tableau de bord</span>
         </a>
         <div class="mt-3 text-xs uppercase text-gray-400 px-3">Gestion</div>
-        @php($__authUser = \App\Models\User::find(session('auth_user_id')))
-        @if($__authUser && $__authUser->role === 'admin')
+        @if(isset($authUser) && $authUser && $authUser->role === 'admin')
           <a href="{{ route('users.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 {{ request()->is('users*') ? 'bg-gray-100 font-medium' : '' }}">
             <span>Utilisateurs</span>
           </a>
@@ -72,8 +70,12 @@
         </div>
         <div class="flex-1"></div>
         <div class="flex items-center gap-3">
-          <span class="hidden sm:block text-sm text-gray-600">Admin</span>
-          <div class="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">A</div>
+          <span class="hidden sm:block text-sm text-gray-600">
+            {{ trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: 'Admin' }}
+          </span>
+          <div class="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            {{ \Illuminate\Support\Str::upper((\Illuminate\Support\Str::substr($authUser->first_name ?? '', 0, 1)) . (\Illuminate\Support\Str::substr($authUser->last_name ?? '', 0, 1))) ?: 'A' }}
+          </div>
         </div>
       </header>
 
