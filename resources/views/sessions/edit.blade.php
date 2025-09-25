@@ -36,15 +36,18 @@
       </div>
 
       <div>
-        <label class="block text-sm text-gray-700 mb-1">Date & Heure</label>
-        @php($dt = optional($session->date_time))
-        <input type="datetime-local" name="date_time" value="{{ old('date_time', $dt ? $dt->format('Y-m-d\TH:i') : '') }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500" required>
-        @error('date_time')<div class="text-sm text-red-600 mt-1">{{ $message }}</div>@enderror
+        <label class="block text-sm text-gray-700 mb-1">Date</label>
+        <select name="slot_date" id="slot_date" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500" required>
+          <option value="">Choisir une date…</option>
+        </select>
+        @error('slot_date')<div class="text-sm text-red-600 mt-1">{{ $message }}</div>@enderror
       </div>
       <div>
-        <label class="block text-sm text-gray-700 mb-1">Durée (minutes)</label>
-        <input type="number" name="duration" value="{{ old('duration', $session->duration) }}" min="1" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500" required>
-        @error('duration')<div class="text-sm text-red-600 mt-1">{{ $message }}</div>@enderror
+        <label class="block text-sm text-gray-700 mb-1">Créneau</label>
+        <select name="slot_period" id="slot_period" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500" required>
+          <option value="">Choisir un créneau…</option>
+        </select>
+        @error('slot_period')<div class="text-sm text-red-600 mt-1">{{ $message }}</div>@enderror
       </div>
 
       <div>
@@ -70,4 +73,69 @@
     </form>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const coachSelect = document.querySelector('select[name="coach_id"]');
+    const dateSelect = document.getElementById('slot_date');
+    const periodSelect = document.getElementById('slot_period');
+
+    const availabilityByCoach = {!! json_encode($availabilityByCoach ?? [], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!};
+    const preDate = @json(old('slot_date', optional($session->slot_date)->format('Y-m-d')));
+    const prePeriod = @json(old('slot_period', $session->slot_period));
+
+    function resetDates() {
+      dateSelect.innerHTML = '<option value="">Choisir une date…</option>';
+      periodSelect.innerHTML = '<option value="">Choisir un créneau…</option>';
+    }
+
+    function resetPeriods() {
+      periodSelect.innerHTML = '<option value="">Choisir un créneau…</option>';
+    }
+
+    function populateDates(coachId) {
+      resetDates();
+      const av = availabilityByCoach[coachId] || [];
+      const uniqueDates = Array.from(new Set(av.map(x => x.date))).sort();
+      uniqueDates.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        const dd = new Date(d);
+        opt.textContent = dd.toLocaleDateString();
+        dateSelect.appendChild(opt);
+      });
+      if (preDate) {
+        dateSelect.value = preDate;
+        populatePeriods(coachId, preDate);
+        if (prePeriod) periodSelect.value = prePeriod;
+      }
+    }
+
+    function populatePeriods(coachId, date) {
+      resetPeriods();
+      const av = availabilityByCoach[coachId] || [];
+      const periods = [];
+      av.filter(x => x.date === date).forEach(x => {
+        (x.periods || []).forEach(p => periods.push(p));
+      });
+      periods.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p; opt.textContent = p;
+        periodSelect.appendChild(opt);
+      });
+    }
+
+    coachSelect.addEventListener('change', () => {
+      resetDates(); resetPeriods();
+      const id = coachSelect.value;
+      if (id) populateDates(id);
+    });
+    dateSelect.addEventListener('change', () => {
+      resetPeriods();
+      const id = coachSelect.value; const d = dateSelect.value;
+      if (id && d) populatePeriods(id, d);
+    });
+
+    if (coachSelect.value) populateDates(coachSelect.value); else resetDates();
+  });
+</script>
 @endsection

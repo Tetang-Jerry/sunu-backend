@@ -30,7 +30,7 @@ class CoachesController extends Controller
         $data = $request->validate([
             'user_id' => ['required', Rule::exists('users','id')->where('role','coach')],
             'specialty' => ['nullable','string','max:255'],
-            'availability' => ['nullable','string','max:255'],
+            'availability_json' => ['nullable','string'],
             'bio' => ['nullable','string'],
         ]);
 
@@ -40,7 +40,22 @@ class CoachesController extends Controller
             return back()->withErrors(['user_id' => 'Ce membre est déjà enregistré comme coach.'])->withInput();
         }
 
-        $coach = Coach::create($data);
+        // prepare availability_json
+        $payload = [
+            'user_id' => $data['user_id'],
+            'specialty' => $data['specialty'] ?? null,
+            'bio' => $data['bio'] ?? null,
+        ];
+        if (!empty($data['availability_json'])) {
+            $decoded = json_decode($data['availability_json'], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $payload['availability_json'] = $decoded;
+            } else {
+                return back()->withErrors(['availability_json' => 'Le format des disponibilités est invalide.'])->withInput();
+            }
+        }
+
+        $coach = Coach::create($payload);
         return redirect()->route('coaches.show', $coach)->with('success', 'Coach créé avec succès');
     }
 
@@ -65,7 +80,7 @@ class CoachesController extends Controller
         $data = $request->validate([
             'user_id' => ['required', Rule::exists('users','id')->where('role','coach')],
             'specialty' => ['nullable','string','max:255'],
-            'availability' => ['nullable','string','max:255'],
+            'availability_json' => ['nullable','string'],
             'bio' => ['nullable','string'],
         ]);
 
@@ -77,7 +92,23 @@ class CoachesController extends Controller
             return back()->withErrors(['user_id' => 'Ce membre est déjà enregistré comme coach.'])->withInput();
         }
 
-        $coach->update($data);
+        $payload = [
+            'user_id' => $data['user_id'],
+            'specialty' => $data['specialty'] ?? null,
+            'bio' => $data['bio'] ?? null,
+        ];
+        if (!empty($data['availability_json'])) {
+            $decoded = json_decode($data['availability_json'], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $payload['availability_json'] = $decoded;
+            } else {
+                return back()->withErrors(['availability_json' => 'Le format des disponibilités est invalide.'])->withInput();
+            }
+        } else {
+            $payload['availability_json'] = null;
+        }
+
+        $coach->update($payload);
         return redirect()->route('coaches.show', $coach)->with('success', 'Coach mis à jour avec succès');
     }
 

@@ -31,7 +31,25 @@
       </div>
       <div>
         <div class="text-sm text-gray-500 mb-1">Disponibilités</div>
-        <div class="text-gray-900">{{ $coach->availability ?: '—' }}</div>
+        @php($av = $coach->availability_json ?? [])
+        @if(is_array($av) && count($av))
+          @php($grouped = collect($av)->groupBy('date')->sortKeys())
+          <div class="space-y-3">
+            @foreach($grouped as $date => $items)
+              @php($periods = collect($items)->pluck('periods')->flatten()->values())
+              <div>
+                <div class="text-sm font-medium text-gray-800">{{ \Carbon\Carbon::parse($date)->format('d/m/Y') }}</div>
+                <div class="mt-1 flex flex-wrap gap-2">
+                  @foreach($periods as $p)
+                    <span class="px-2 py-1 text-xs rounded-full bg-emerald-50 text-emerald-700">{{ $p }}</span>
+                  @endforeach
+                </div>
+              </div>
+            @endforeach
+          </div>
+        @else
+          <div class="text-gray-900">—</div>
+        @endif
       </div>
     </div>
 

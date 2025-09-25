@@ -18,10 +18,13 @@ class TrainingSession extends Model
         'duration',
         'status',
         'location',
+        'slot_date',
+        'slot_period',
     ];
 
     protected $casts = [
         'date_time' => 'datetime',
+        'slot_date' => 'date',
     ];
 
     public function coach()
@@ -31,6 +34,8 @@ class TrainingSession extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Member::class);
     }
+
+    
 }

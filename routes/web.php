@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MembersConroller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UsersController;
@@ -41,6 +42,16 @@ Route::middleware('auth.session')->group(function () {
         Route::get('/{user}/edit', [UsersController::class, 'edit'])->name('edit');
         Route::put('/{user}', [UsersController::class, 'update'])->name('update');
         Route::delete('/{user}', [UsersController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('members')->name('members.')->group(function () {
+         Route::get('/', [MembersConroller::class, 'index'])->name('index');
+        Route::get('/create', [MembersConroller::class, 'create'])->name('create');
+        Route::post('/', [MembersConroller::class, 'store'])->name('store');
+        Route::get('/{member}', [MembersConroller::class, 'show'])->name('show');
+        Route::get('/{member}/edit', [MembersConroller::class, 'edit'])->name('edit');
+        Route::put('/{member}', [MembersConroller::class, 'update'])->name('update');
+        Route::delete('/{member}', [MembersConroller::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('sessions')->name('sessions.')->group(function () {

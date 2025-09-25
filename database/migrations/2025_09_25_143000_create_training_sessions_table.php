@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('training_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('coach_id')->constrained('coaches')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('members')->cascadeOnDelete();
             $table->dateTime('date_time');
             $table->integer('duration'); // minutes
             $table->string('status')->default('à venir'); // à venir, complétée, annulée
